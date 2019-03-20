@@ -30,7 +30,7 @@ export default class App extends Component<Props> {
                 t.index = index;
                 t.pos_x = i;
                 t.pos_y = j;
-                i === 3 && j === 3 ? t.isEmpty = true : t.isEmpty = false; // Last tile is empty
+                index === 15 ? t.isEmpty = true : t.isEmpty = false; // Last tile is empty
                 children.push(t);
                 
                 index++;
@@ -52,7 +52,7 @@ export default class App extends Component<Props> {
                 
                 // Check if a tile exists at this table index
                 if (!tiles[i][j].isEmpty) {
-                    children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(tiles[i][j].index)}></Tile>);
+                    children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(tiles[i][j])} id={tiles[i][j].index + 1}></Tile>);
                 } else {
                     children.push(<View style={styles.tableCell}></View>);
                 }
@@ -65,8 +65,8 @@ export default class App extends Component<Props> {
     }
     
     // Respond to touches
-    tileTapped(key) {
-        alert("Tile ID: " + key);
+    tileTapped(tile) {
+        alert(tile.index);
     }
     
     // Main render function

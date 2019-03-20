@@ -6,7 +6,7 @@ export default class Tile extends Component<Props> {
     render() {
         return (
             <TouchableOpacity style={styles.tile} onPress={this.props.onPress}>
-                <Text style={styles.tileNumber}>?</Text>
+                <Text style={styles.tileNumber}>{this.props.id}</Text>
             </TouchableOpacity>
         );
     }
