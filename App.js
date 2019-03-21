@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import Tile from './components/Tile';
+import EmptyTile from './components/EmptyTile';
 
 // Constructor for tile
 function tile(index, isEmpty) {
@@ -53,7 +54,7 @@ export default class App extends Component<Props> {
                 if (!tiles[i][j].isEmpty) {
                     children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={tiles[i][j].index + 1}></Tile>);
                 } else {
-                    children.push(<View key={tiles[i][j].index} style={styles.tableCell}></View>);
+                    children.push(<EmptyTile key={tiles[i][j].index}></EmptyTile>);
                 }
             }
             
@@ -122,12 +123,5 @@ const styles = StyleSheet.create({
     },
     tableRow: {
         flexDirection: "row",
-    },
-    tableCell: {
-        flex: 1,
-        aspectRatio: 1,
-        backgroundColor: 'darkgray',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });
