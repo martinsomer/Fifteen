@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 type Props = {};
 export default class EmptyTile extends Component<Props> {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import Tile from './components/Tile';
 import EmptyTile from './components/EmptyTile';
 
@@ -34,6 +34,7 @@ export default class App extends Component<Props> {
             tiles.push(children);
         }
         
+        // Save tiles
         this.state.tiles = tiles;
     }
     
