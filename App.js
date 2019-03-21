@@ -66,7 +66,33 @@ export default class App extends Component<Props> {
     
     // Respond to touches
     tileTapped(tile) {
-        alert(tile.index);
+        //alert(tile.index);
+                        
+        //find empty tile
+        let emptyTile;
+        for (let i=0; i<4; i++) {
+            for (let j=0; j<4; j++) {
+                if (tiles[i][j].isEmpty === true) {
+                    emptyTile = tiles[i][j];
+                    i = j = 4;
+                    break;
+                }
+            }
+        }
+        
+        if ((
+            // Tiles are adjacent on X axis and on the same Y axis
+            (tile.pos_x+1 === emptyTile.pos_x ||
+            tile.pos_x-1 === emptyTile.pos_x
+            ) && tile.pos_y === emptyTile.pos_y
+        ) || ((
+            // Tiles are adjacent on Y axis and on the same X axis
+            tile.pos_y+1 === emptyTile.pos_y ||
+            tile.pos_y-1 === emptyTile.pos_y
+            ) && tile.pos_x === emptyTile.pos_x
+        )) {
+            //swap
+        }
     }
     
     // Main render function
