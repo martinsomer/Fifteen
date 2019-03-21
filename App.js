@@ -2,15 +2,10 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import Tile from './components/Tile';
 
-// Array for holding all tiles
-const tiles = [];
-
-// Object for tile
-const tile = {
-    index: null,
-    pos_x: null,
-    pos_y: null,
-    isEmpty: false,
+// Constructor for tile
+function tile(index, isEmpty) {
+    this.index = index;
+    this.isEmpty = isEmpty;
 }
 
 type Props = {};
@@ -20,27 +15,31 @@ export default class App extends Component<Props> {
     constructor(props) {
         super(props);
         
+        // Array for holding all tiles
+        this.state = {
+            tiles: [],
+        };
+        
         let index = 0;
         
+        const tiles = [];
         for (let i=0; i<4; i++) {
             const children = [];
             
             for (let j=0; j<4; j++) {
-                const t = Object.create(tile);
-                t.index = index;
-                t.pos_x = i;
-                t.pos_y = j;
-                index === 15 ? t.isEmpty = true : t.isEmpty = false; // Last tile is empty
-                children.push(t);
-                
+                children.push(new tile(index, index === 15 ? true : false));
                 index++;
             }
             tiles.push(children);
         }
+        
+        this.state.tiles = tiles;
     }
     
     // Create the table for rendering
-    createTable = () => {
+    createTable() {
+        const tiles = this.state.tiles;
+    
         let table = [];
 
         // Outer loop to create parent
@@ -50,30 +49,34 @@ export default class App extends Component<Props> {
             // Inner loop to create children
             for (let j=0; j<4; j++) {
                 
-                // Check if a tile exists at this table index
+                // Check if a tile at this index is empty
                 if (!tiles[i][j].isEmpty) {
-                    children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(tiles[i][j])} id={tiles[i][j].index + 1}></Tile>);
+                    children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={tiles[i][j].index + 1}></Tile>);
                 } else {
-                    children.push(<View style={styles.tableCell}></View>);
+                    children.push(<View key={tiles[i][j].index} style={styles.tableCell}></View>);
                 }
             }
             
-            // Create the parent and add the children
-            table.push(<View style={styles.tableRow}>{children}</View>);
+            // Add children to parent
+            table.push(<View key={i} style={styles.tableRow}>{children}</View>);
         }
         return table;
     }
     
     // Respond to touches
-    tileTapped(tile) {
-        //alert(tile.index);
-                        
-        //find empty tile
-        let emptyTile;
+    tileTapped(tile_x, tile_y) {
+        
+        const tiles = this.state.tiles;
+        
+        //find empty tile's position
+        let emptyTile_x;
+        let emptyTile_y;
+        
         for (let i=0; i<4; i++) {
             for (let j=0; j<4; j++) {
                 if (tiles[i][j].isEmpty === true) {
-                    emptyTile = tiles[i][j];
+                    emptyTile_x = i;
+                    emptyTile_y = j;
                     i = j = 4;
                     break;
                 }
@@ -82,17 +85,23 @@ export default class App extends Component<Props> {
         
         if ((
             // Tiles are adjacent on X axis and on the same Y axis
-            (tile.pos_x+1 === emptyTile.pos_x ||
-            tile.pos_x-1 === emptyTile.pos_x
-            ) && tile.pos_y === emptyTile.pos_y
+            (tile_x+1 === emptyTile_x ||
+            tile_x-1 === emptyTile_x
+            ) && tile_y === emptyTile_y
         ) || ((
             // Tiles are adjacent on Y axis and on the same X axis
-            tile.pos_y+1 === emptyTile.pos_y ||
-            tile.pos_y-1 === emptyTile.pos_y
-            ) && tile.pos_x === emptyTile.pos_x
+            tile_y+1 === emptyTile_y ||
+            tile_y-1 === emptyTile_y
+            ) && tile_x === emptyTile_x
         )) {
-            //swap
+             // Swap tiles
+            [tiles[tile_x][tile_y], tiles[emptyTile_x][emptyTile_y]] = [tiles[emptyTile_x][emptyTile_y], tiles[tile_x][tile_y]]
         }
+        
+        // Save the new position of tiles
+        this.setState({
+           tiles: tiles,
+        });
     }
     
     // Main render function
