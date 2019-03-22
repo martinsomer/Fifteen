@@ -14,9 +14,7 @@ const styles = StyleSheet.create({
     emptyTile: {
         flex: 1,
         aspectRatio: 1,
-        margin: 5,
-        marginRight: 2.5,
-        marginLeft: 2.5,
+        margin: 2.5,
         backgroundColor: 'transparent',
     },
 });

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Tile from './components/Tile';
 import EmptyTile from './components/EmptyTile';
+import Moves from './components/Moves';
 
 // Constructor for tile
 function tile(index, isEmpty) {
@@ -131,6 +132,9 @@ export default class App extends Component<Props> {
         )) {
              // Swap tiles
             [tiles[tile_x][tile_y], tiles[emptyTile_x][emptyTile_y]] = [tiles[emptyTile_x][emptyTile_y], tiles[tile_x][tile_y]]
+            
+            // Add 1 to moves counter
+            this.refs.movesComponent.increaseMoveCount();
         }
         
         // Save new position of tiles
@@ -155,7 +159,8 @@ export default class App extends Component<Props> {
             }
         }
         if (win) {
-            alert("You win!");
+            this.refs.movesComponent.win();
+            this.refs.movesComponent.resetMovesCount();
             this.scrambleTiles();
         }
     }
@@ -164,7 +169,10 @@ export default class App extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                {this.createTable()}
+                <Moves ref='movesComponent' {...this.props}></Moves>
+                <View style={styles.tilesContainer}>
+                    {this.createTable()}
+                </View>
             </View>
         );
     }
@@ -178,5 +186,9 @@ const styles = StyleSheet.create({
     },
     tableRow: {
         flexDirection: "row",
+    },
+    tilesContainer: {
+        flex: 1,
+        margin: 2.5,
     },
 });
