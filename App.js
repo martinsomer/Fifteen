@@ -33,7 +33,7 @@ export default class App extends Component<Props> {
             const children = [];
             
             for (let j=0; j<4; j++) {
-                children.push(new tile(index, index === 15 ? false : false));
+                children.push(new tile(index, index === 15 ? true : false));
                 index++;
             }
             
@@ -52,10 +52,10 @@ export default class App extends Component<Props> {
         // Create a copy of tiles
         const tiles = this.state.tiles;
         
-        // Scarmble array of random numbers
+        // Scarmble array of random numbers (leave last item same)
         const randomNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
         for (let i=0; i<randomNumbers.length - 1; i++) {
-            const randomNum = Math.floor(Math.random()*15) + 1;
+            const randomNum = Math.floor(Math.random()*14) + 1;
             [randomNumbers[i], randomNumbers[randomNum]] = [randomNumbers[randomNum], randomNumbers[i]]
         }
         
@@ -64,7 +64,6 @@ export default class App extends Component<Props> {
         for (let i=0; i<4; i++) {
             for (let j=0; j<4; j++) {
                 tiles[i][j].index = randomNumbers[index];
-                if (randomNumbers[index] === 15) tiles[i][j].isEmpty = true;
                 index++;
             }
         }
@@ -138,6 +137,27 @@ export default class App extends Component<Props> {
         this.setState({
            tiles: tiles,
         });
+        
+        this.checkForWin();
+    }
+    
+    checkForWin() {
+        let win = true;
+        let index = 0;
+        for (let i=0; i<4; i++) {
+            for (let j=0; j<4; j++) {
+                if (this.state.tiles[i][j].index != index) {
+                    win = false;
+                    i = j = 4;
+                    break;
+                }
+                index++;
+            }
+        }
+        if (win) {
+            alert("You win!");
+            this.scrambleTiles();
+        }
     }
     
     // Main render function
