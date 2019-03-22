@@ -12,45 +12,80 @@ function tile(index, isEmpty) {
 type Props = {};
 export default class App extends Component<Props> {
     
-    // Create tiles when component starts
+    // Create and scramble tiles when component starts
     constructor(props) {
         super(props);
         
-        // Array for holding all tiles
         this.state = {
             tiles: [],
         };
         
+        this.generateTiles();
+        this.scrambleTiles();
+    }
+    
+    // Generate tiles into 2D array
+    generateTiles() {
         let index = 0;
-        
         const tiles = [];
+        
         for (let i=0; i<4; i++) {
             const children = [];
             
             for (let j=0; j<4; j++) {
-                children.push(new tile(index, index === 15 ? true : false));
+                children.push(new tile(index, index === 15 ? false : false));
                 index++;
             }
+            
             tiles.push(children);
         }
         
-        // Save tiles
-        this.state.tiles = tiles;
+        // Save generated tiles
+        this.state = {
+            tiles: tiles,
+        };
+    }
+    
+    // Randomize indexes of tiles
+    scrambleTiles() {
+        
+        // Create a copy of tiles
+        const tiles = this.state.tiles;
+        
+        // Scarmble array of random numbers
+        const randomNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        for (let i=0; i<randomNumbers.length - 1; i++) {
+            const randomNum = Math.floor(Math.random()*15) + 1;
+            [randomNumbers[i], randomNumbers[randomNum]] = [randomNumbers[randomNum], randomNumbers[i]]
+        }
+        
+        // Assign array items to tile indexes
+        let index = 0;
+        for (let i=0; i<4; i++) {
+            for (let j=0; j<4; j++) {
+                tiles[i][j].index = randomNumbers[index];
+                if (randomNumbers[index] === 15) tiles[i][j].isEmpty = true;
+                index++;
+            }
+        }
+        
+        // Save new position of tiles
+        this.state = {
+            tiles: tiles,
+        };
     }
     
     // Create the table for rendering
     createTable() {
+        
+        // Create a copy of tiles
         const tiles = this.state.tiles;
-    
-        let table = [];
-
-        // Outer loop to create parent
+        
+        // Generate 2D array for tiles
+        const table = [];
         for (let i=0; i<4; i++) {
-            let children = [];
-            
-            // Inner loop to create children
+            const children = [];
             for (let j=0; j<4; j++) {
-                
                 // Check if a tile at this index is empty
                 if (!tiles[i][j].isEmpty) {
                     children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={tiles[i][j].index + 1}></Tile>);
@@ -58,8 +93,6 @@ export default class App extends Component<Props> {
                     children.push(<EmptyTile key={tiles[i][j].index}></EmptyTile>);
                 }
             }
-            
-            // Add children to parent
             table.push(<View key={i} style={styles.tableRow}>{children}</View>);
         }
         return table;
@@ -68,6 +101,7 @@ export default class App extends Component<Props> {
     // Respond to touches
     tileTapped(tile_x, tile_y) {
         
+        // Create a copy of tiles
         const tiles = this.state.tiles;
         
         //find empty tile's position
@@ -100,7 +134,7 @@ export default class App extends Component<Props> {
             [tiles[tile_x][tile_y], tiles[emptyTile_x][emptyTile_y]] = [tiles[emptyTile_x][emptyTile_y], tiles[tile_x][tile_y]]
         }
         
-        // Save the new position of tiles
+        // Save new position of tiles
         this.setState({
            tiles: tiles,
         });
