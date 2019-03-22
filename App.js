@@ -53,7 +53,7 @@ export default class App extends Component<Props> {
         // Create a copy of tiles
         const tiles = this.state.tiles;
         
-        // Scarmble array of random numbers (leave last item same)
+        // Scarmble array of random numbers (leave last item unchanged)
         const randomNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
         for (let i=0; i<randomNumbers.length - 1; i++) {
             const randomNum = Math.floor(Math.random()*14) + 1;
@@ -85,7 +85,9 @@ export default class App extends Component<Props> {
         const table = [];
         for (let i=0; i<4; i++) {
             const children = [];
+            
             for (let j=0; j<4; j++) {
+                
                 // Check if a tile at this index is empty
                 if (!tiles[i][j].isEmpty) {
                     children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={tiles[i][j].index + 1}></Tile>);
@@ -104,7 +106,7 @@ export default class App extends Component<Props> {
         // Create a copy of tiles
         const tiles = this.state.tiles;
         
-        //find empty tile's position
+        // Find empty tile's position
         let emptyTile_x;
         let emptyTile_y;
         
@@ -148,6 +150,7 @@ export default class App extends Component<Props> {
     checkForWin() {
         let win = true;
         let index = 0;
+        
         for (let i=0; i<4; i++) {
             for (let j=0; j<4; j++) {
                 if (this.state.tiles[i][j].index != index) {
@@ -158,6 +161,7 @@ export default class App extends Component<Props> {
                 index++;
             }
         }
+        
         if (win) {
             this.refs.movesComponent.win();
             this.refs.movesComponent.resetMovesCount();
@@ -169,9 +173,13 @@ export default class App extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                <Moves ref='movesComponent' {...this.props}></Moves>
-                <View style={styles.tilesContainer}>
-                    {this.createTable()}
+                <View style={styles.header}>
+                    <Moves ref='movesComponent' {...this.props}/>
+                </View>
+                <View style={styles.content}>
+                    <View style={styles.tilesContainer}>
+                        {this.createTable()}
+                    </View>
                 </View>
             </View>
         );
@@ -184,11 +192,18 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5FCFF',
     },
-    tableRow: {
-        flexDirection: "row",
+    header: {
+        flex: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    content: {
+        flex: 4,
     },
     tilesContainer: {
-        flex: 1,
         margin: 2.5,
+    },
+    tableRow: {
+        flexDirection: "row",
     },
 });

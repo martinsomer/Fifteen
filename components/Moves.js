@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 
 type Props = {};
 export default class Moves extends Component<Props> {
@@ -25,25 +25,22 @@ export default class Moves extends Component<Props> {
     }
     
     win() {
-        alert("You won with " + this.state.moves + " moves!");
+        alert("You beat the game in " + this.state.moves + " moves!");
     }
     
     render() {
         return (
-            <View style={styles.container}>
-                <Text style={styles.movesText}>MOVES: {this.state.moves}</Text>
-            </View>
+            <Text style={styles.movesText}>{this.state.moves} MOVES</Text>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#F5FCFF',
-    },
     movesText: {
+        textAlign: 'center',
+        alignSelf: 'stretch',
         color: '#00BFA5',
-        fontSize: 35,
+        fontSize: 30,
         fontWeight: 'bold',
     }
 });
