@@ -4,54 +4,48 @@ import Tile from './components/Tile';
 import EmptyTile from './components/EmptyTile';
 import Moves from './components/Moves';
 
-// Constructor for tile
-function tile(index, isEmpty) {
+// Tile constructor
+function tile(index) {
     this.index = index;
-    this.isEmpty = isEmpty;
 }
 
 type Props = {};
 export default class App extends Component<Props> {
     
-    // Create and scramble tiles when component starts
+    // Create and scramble tiles
     constructor(props) {
         super(props);
         
         this.state = {
-            tiles: [],
+            tiles: (() => this.scrambleTiles(this.generateTiles()))(),
+            emptyTile: {
+                pos_x: 3,
+                pos_y: 3,
+            },
         };
-        
-        this.generateTiles();
-        this.scrambleTiles();
     }
     
-    // Generate tiles into 2D array
+    // Generate 2D array of tiles
     generateTiles() {
         let index = 0;
         const tiles = [];
         
         for (let i=0; i<4; i++) {
-            const children = [];
+            const row = [];
             
             for (let j=0; j<4; j++) {
-                children.push(new tile(index, index === 15 ? true : false));
+                row.push(new tile(index));
                 index++;
             }
             
-            tiles.push(children);
+            tiles.push(row);
         }
         
-        // Save generated tiles
-        this.state = {
-            tiles: tiles,
-        };
+        return tiles;
     }
     
     // Randomize indexes of tiles
-    scrambleTiles() {
-        
-        // Create a copy of tiles
-        const tiles = this.state.tiles;
+    scrambleTiles(tiles) {
         
         // Scarmble array of random numbers (leave last item unchanged)
         const randomNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -69,80 +63,59 @@ export default class App extends Component<Props> {
             }
         }
         
-        // Save new position of tiles
-        this.state = {
-            tiles: tiles,
-        };
+        return tiles;
     }
     
-    // Create the table for rendering
-    createTable() {
+    // Create table for rendering
+    renderTable() {
         
-        // Create a copy of tiles
-        const tiles = this.state.tiles;
-        
-        // Generate 2D array for tiles
+        // Generate 2D array of tiles
         const table = [];
         for (let i=0; i<4; i++) {
-            const children = [];
+            const row = [];
             
             for (let j=0; j<4; j++) {
-                
-                // Check if a tile at this index is empty
-                if (!tiles[i][j].isEmpty) {
-                    children.push(<Tile key={tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={tiles[i][j].index + 1}></Tile>);
+                if (this.state.emptyTile.pos_x !== i || this.state.emptyTile.pos_y !== j) {
+                    row.push(<Tile key={this.state.tiles[i][j].index} onPress={() => this.tileTapped(i, j)} id={this.state.tiles[i][j].index + 1}></Tile>);
                 } else {
-                    children.push(<EmptyTile key={tiles[i][j].index}></EmptyTile>);
+                    row.push(<EmptyTile key={this.state.tiles[i][j].index}></EmptyTile>);
                 }
             }
-            table.push(<View key={i} style={styles.tableRow}>{children}</View>);
+            table.push(<View key={i} style={styles.tableRow}>{row}</View>);
         }
         return table;
     }
     
-    // Respond to touches
     tileTapped(tile_x, tile_y) {
         
-        // Create a copy of tiles
-        const tiles = this.state.tiles;
-        
-        // Find empty tile's position
-        let emptyTile_x;
-        let emptyTile_y;
-        
-        for (let i=0; i<4; i++) {
-            for (let j=0; j<4; j++) {
-                if (tiles[i][j].isEmpty === true) {
-                    emptyTile_x = i;
-                    emptyTile_y = j;
-                    i = j = 4;
-                    break;
-                }
-            }
-        }
+        let empty_x = this.state.emptyTile.pos_x;
+        let empty_y = this.state.emptyTile.pos_y;
         
         if ((
             // Tiles are adjacent on X axis and on the same Y axis
-            (tile_x+1 === emptyTile_x ||
-            tile_x-1 === emptyTile_x
-            ) && tile_y === emptyTile_y
+            (tile_x+1 === empty_x ||
+            tile_x-1 === empty_x
+            ) && tile_y === empty_y
         ) || ((
             // Tiles are adjacent on Y axis and on the same X axis
-            tile_y+1 === emptyTile_y ||
-            tile_y-1 === emptyTile_y
-            ) && tile_x === emptyTile_x
+            tile_y+1 === empty_y ||
+            tile_y-1 === empty_y
+            ) && tile_x === empty_x
         )) {
-             // Swap tiles
-            [tiles[tile_x][tile_y], tiles[emptyTile_x][emptyTile_y]] = [tiles[emptyTile_x][emptyTile_y], tiles[tile_x][tile_y]]
+            // Swap tiles
+            const tiles = this.state.tiles;
+            [tiles[tile_x][tile_y], tiles[empty_x][empty_y]] = [tiles[empty_x][empty_y], tiles[tile_x][tile_y]];
             
-            // Add 1 to moves counter
+            this.setState({
+               tiles: tiles,
+                emptyTile: {
+                    pos_x: tile_x,
+                    pos_y: tile_y,
+                },
+            });
+            
             this.refs.movesComponent.increaseMoveCount();
         }
-        
-        // Save new position of tiles
-        this.setState({
-           tiles: tiles,
-        });
         
         this.checkForWin();
     }
@@ -165,11 +138,17 @@ export default class App extends Component<Props> {
         if (win) {
             this.refs.movesComponent.win();
             this.refs.movesComponent.resetMovesCount();
-            this.scrambleTiles();
+            
+            this.setState({
+               tiles: (() => this.scrambleTiles(this.state.tiles))(),
+                emptyTile: {
+                    pos_x: 3,
+                    pos_y: 3,
+                },
+            });
         }
     }
     
-    // Main render function
     render() {
         return (
             <View style={styles.container}>
@@ -178,7 +157,7 @@ export default class App extends Component<Props> {
                 </View>
                 <View style={styles.content}>
                     <View style={styles.tilesContainer}>
-                        {this.createTable()}
+                        {this.renderTable()}
                     </View>
                 </View>
             </View>
@@ -186,7 +165,6 @@ export default class App extends Component<Props> {
     }
 }
 
-// Stylesheet
 const styles = StyleSheet.create({
     container: {
         flex: 1,
